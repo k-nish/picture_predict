@@ -10,7 +10,7 @@ Tpast = 20;
 #YはXをhstackしたもの
 Y = [];
 for it = 3:Tend
-	filepath = strcat('/Volumes/K2/ouyou/input/fig',num2str(it),'.jpg');
+	filepath = strcat('/Volumes/K2/picture_predict/input/fig',num2str(it),'.jpg');
 	imname = filepath;
 	I = imread(imname);
 	[px,py,pc] = size(I);
@@ -37,8 +37,12 @@ endfor
 V1 = reshape(V_(:,1),px,py,pc);
 imagesc(V1)
 
-# a(j,t)の作成
+# (4):a(j,t)の作成
 a=V_'*Y;
 b = a;
 figure(2);
 plot(a');
+
+# (5):スコアa(j,t)の未来変化予測
+
+
