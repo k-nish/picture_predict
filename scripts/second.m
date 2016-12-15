@@ -42,7 +42,7 @@ a=V_'*Y;
 b = a;
 figure(2);
 plot(a');
-
+size(a)
 # (5):スコアa(j,t)の未来変化予測
 
 

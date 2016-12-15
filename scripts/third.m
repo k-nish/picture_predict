@@ -1,6 +1,6 @@
 clear all;
 
-Tend = 940;
+Tend = 938;
 Tpast = 600;
 
 Tend = 30;
@@ -11,8 +11,8 @@ r = 5
 #Xは各画像を1次元に変換したもの.
 #YはXをhstackしたもの
 Y = [];
-for it = 3:Tend
-	filepath = strcat('/Volumes/K2/picture_predict/input/fig',num2str(it),'.jpg');
+for it = 1:Tend
+	filepath = strcat('/Volumes/K2/picture_predict/input/fig',num2str(it+2),'.jpg');
 	imname = filepath;
 	I = imread(imname);
 	[px,py,pc] = size(I);
@@ -21,7 +21,6 @@ for it = 3:Tend
 	Y = [Y reshape(I, [px*py*pc,1])];
 	figure(100);
 	image(I);
-	# Y = reshape(II,[px*py*pc/16,1]);	
 endfor
 
 clear I;
@@ -32,6 +31,7 @@ p=10
 # k= 900
 K = 10
 N = 20
+# N = 700
 
 A = []
 for k=1:K
@@ -47,25 +47,42 @@ for k=1:K
 	    V_ = [V_ V(:,i)/norm(V(:,i))];
     endfor
 
-    # V1 = reshape(V_(:,1),px,py,pc);
-    # imagesc(V1)
 
-    # (4):a(j,t)の作成
     # a=V_'*Y;
     # plot(a');
-
-    for tt = 1:p
-        a = V_'*Y;
+    
+    a = V_'*Y;
     endfor
     
-    A = [A a]
+    B = []
+    for j =1:r
+        A = [];
+        for i =1:N-M+1:
+            A = [A a'(j,i:i+M-1)]
+        endfor
+
+        # A_crの計算
+        I = ones(N-p+1,1)
+
+        A_cr = A - A(I*I'/(I'*I));
+
+        B = A_cr*(A_cr');
+
+        [W,D] = eigs(B'*B,r);
+
+        q_prepare = A_cr(:,size(A_cr,2)
+        q_prepare = q_prepare(1:size(q_prepare,1)-1,1)
+        q_1 = [0]
+        Q = vertcat(q_1, q_prepare)
+
+        L = zeros(M,1);
+        L(1,1) = 1
+
+        a_t1= ((L'*W)*(W'*Q))/(1 - (L*W)*(W'*L))
+
+        B = [B a_t1]
+
+    endfor
 endfor
-
-# p26
-I = ones(N-p+1,1)
-
-A_cr = A - A(I*I'/(I'*I))
-
-B = A_cr * (A_cr')
 
 
