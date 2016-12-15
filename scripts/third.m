@@ -33,12 +33,12 @@ K = 10
 N = 20
 # N = 700
 
-A = []
+A = [];
 for k=1:K
     # Y_train = Y(:,1:Tpast)
-    start_index = 1 + (k-1) * p
-    end_index = N + (k-1) * p
-    Y_train = Y(:,start_index:end_index)
+    start_index = 1 + (k-1) * p;
+    end_index = N + (k-1) * p;
+    Y_train = Y(:,start_index:end_index);
     [U,D] = eigs(Y_train'*Y_train,r);
     V = Y_train*U;
 
@@ -52,37 +52,41 @@ for k=1:K
     # plot(a');
     
     a = V_'*Y;
-    endfor
+    size(a)
     
-    B = []
+    E = [];
     for j =1:r
         A = [];
-        for i =1:N-M+1:
-            A = [A a'(j,i:i+M-1)]
+        for i =1:N-p+1
+            # A = [A a(j,i:i+p-1)'];
+            A = [A a(j,i:i+p-1)'];
         endfor
 
         # A_crの計算
-        I = ones(N-p+1,1)
+        I = ones(N-p+1,1);
 
-        A_cr = A - A(I*I'/(I'*I));
+        # A_cr = A - A(I*I'/(I'*I));
 
-        B = A_cr*(A_cr');
+        # B = A_cr*(A_cr');
+        B = A * A';
 
         [W,D] = eigs(B'*B,r);
 
-        q_prepare = A_cr(:,size(A_cr,2)
-        q_prepare = q_prepare(1:size(q_prepare,1)-1,1)
-        q_1 = [0]
-        Q = vertcat(q_1, q_prepare)
 
-        L = zeros(M,1);
-        L(1,1) = 1
+        q_prepare = A(:,size(A,2));
+        q_prepare = q_prepare(1:size(q_prepare,1)-1,1);
+        q_1 = [0];
+        Q = vertcat(q_1, q_prepare);
 
-        a_t1= ((L'*W)*(W'*Q))/(1 - (L*W)*(W'*L))
+        L = zeros(p,1);
+        L(1,1) = 1;
 
-        B = [B a_t1]
+        a_t1= ((L'*W)*(W'*Q))/(1 - (L'*W)*(W'*L));
+
+        E = [E a_t1];
 
     endfor
+
 endfor
 
 
