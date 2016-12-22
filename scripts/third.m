@@ -1,10 +1,10 @@
 clear all;
 
 Tend = 938;
-Tpast = 600;
+Tpast = 100;
 
-Tend = 30;
-Tpast = 20;
+# Tend = 30;
+# Tpast = 20;
 
 r = 5
 
@@ -16,10 +16,11 @@ for it = 1:Tend
 	imname = filepath;
 	I = imread(imname);
 	[px,py,pc] = size(I);
-	I = I(end:-1:1,:);
-	# II = I(4:4:px,4:4:py,:);
+	# I = I(end:-1:1,:);
+    I = I(1:4:end,1:4:end,1:3);
+    [px,py,pc] = size(I);
 	Y = [Y reshape(I, [px*py*pc,1])];
-	figure(100);
+	figure(1000);
 	image(I);
 endfor
 
@@ -27,17 +28,18 @@ clear I;
 
 Y = double(Y);
 
-p=10
-# k= 900
+p=3
+#K= 900
 K = 10
-N = 20
+N = 100
 # N = 700
+# M = 100
+M = 70
 
 A = [];
 for k=1:K
-    # Y_train = Y(:,1:Tpast)
-    start_index = 1 + (k-1) * p;
-    end_index = N + (k-1) * p;
+    start_index = 1 + (k-1)*p;
+    end_index = N + (k-1)*p;
     Y_train = Y(:,start_index:end_index);
     [U,D] = eigs(Y_train'*Y_train,r);
     V = Y_train*U;
@@ -47,46 +49,48 @@ for k=1:K
 	    V_ = [V_ V(:,i)/norm(V(:,i))];
     endfor
 
-
-    # a=V_'*Y;
-    # plot(a');
-    
     a = V_'*Y;
     size(a)
+    b = a;
     
     E = [];
     for j =1:r
         A = [];
-        for i =1:N-p+1
-            # A = [A a(j,i:i+p-1)'];
-            A = [A a(j,i:i+p-1)'];
+        for i = N-M+1:-1:1
+            A = [a(j,i+M-1:-1:i)' A ];
         endfor
 
-        # A_crの計算
-        I = ones(N-p+1,1);
-
-        # A_cr = A - A(I*I'/(I'*I));
-
-        # B = A_cr*(A_cr');
         B = A * A';
 
-        [W,D] = eigs(B'*B,r);
+        [W,D] = eigs(B,r);
 
+        q_prepare = A(1:M-1,N-M+1);
+        for it = 1:p
+            q_1 = [0];
+            Q = vertcat(q_1, q_prepare);
+            L = zeros(M,1);
+            L(1,1) = 1;
+            a_t1= ((L'*W)*(W'*Q))/(1 - (L'*W)*(W'*L));
+            q_prepare = [a_t1; q_prepare(1:M-2)];
 
-        q_prepare = A(:,size(A,2));
-        q_prepare = q_prepare(1:size(q_prepare,1)-1,1);
-        q_1 = [0];
-        Q = vertcat(q_1, q_prepare);
-
-        L = zeros(p,1);
-        L(1,1) = 1;
-
-        a_t1= ((L'*W)*(W'*Q))/(1 - (L'*W)*(W'*L));
-
-        E = [E a_t1];
-
+            E(j,it) = a_t1;
+        endfor
     endfor
-
+    
+    X_new = V*E;
+    for it=1:p
+        S = X_new(:,it);
+        ImageP = reshape(S,px,py,pc);
+        ImageP = ImageP/max(max(max(ImageP)));
+        # ImageP(ImageP<0)=0;
+        # ImageP(ImageP>1)=1;
+        # real_picture=Y()
+        figure(it);
+        # image(ImageP);
+        figure(1);
+        # image(reshape(Y(:,end_index),px,py,pc))
+        image_o = (reshape(Y(:,end_index + it),px,py,pc));
+        image_o = image_o/max(max(max(image_o)));
+        imagesc([image_o,ImageP]);
+    endfor
 endfor
-
-
