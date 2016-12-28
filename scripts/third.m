@@ -15,9 +15,13 @@ for it = 1:Tend
 	filepath = strcat('/Volumes/K2/picture_predict/input/fig',num2str(it+2),'.jpg');
 	imname = filepath;
 	I = imread(imname);
+    size(I)
 	[px,py,pc] = size(I);
 	# I = I(end:-1:1,:);
+    I = I(end:-1:1,1:1:end,1:3);
+    size(I)
     I = I(1:4:end,1:4:end,1:3);
+    size(I)
     [px,py,pc] = size(I);
 	Y = [Y reshape(I, [px*py*pc,1])];
 	figure(1000);
@@ -28,13 +32,12 @@ clear I;
 
 Y = double(Y);
 
-p=3
-#K= 900
-K = 10
-N = 100
+p=3;
+K = 290
+N = 50
 # N = 700
 # M = 100
-M = 70
+M = 20
 
 A = [];
 for k=1:K
