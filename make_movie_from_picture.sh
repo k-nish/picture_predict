@@ -1,1 +1,1 @@
-ffmpeg %03d.png -pix_fmt yuv420p dest.mp4
+ffmpeg -i %03d.jpg -pix_fmt yuv420p dest.mp4
